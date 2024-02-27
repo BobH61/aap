@@ -1,0 +1,24 @@
+---
+- name: Check and update sudoers file
+  hosts: your_target_hosts
+  become: true
+  tasks:
+    - name: Check if the line exists in sudoers
+      shell: grep -q '^casrvadvault2 ALL = /bin/su - oracle' /etc/sudoers
+      register: grep_result
+      ignore_errors: yes
+
+    - name: Add line to sudoers if not present
+      block:
+        - name: Append line to sudoers
+          lineinfile:
+            path: /etc/sudoers
+            line: 'casrvadvault2 ALL = /bin/su - oracle'
+            state: present
+            insertafter: EOF
+          when: grep_result.rc != 0
+
+      rescue:
+        - name: Display an error message
+          debug:
+            msg: "Failed to update sudoers file"
