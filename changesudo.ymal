@@ -1,7 +1,8 @@
 ---
 - name: Check and update sudoers file
-  hosts: ALL
-  become: true
+  hosts: "{{ target_host }}"
+  become: yes
+  gater_facts: no
   tasks:
     - name: Check if the line exists in sudoers
       shell: grep -q '^casrvadvault2 ALL = /bin/su - oracle' /etc/sudoers
